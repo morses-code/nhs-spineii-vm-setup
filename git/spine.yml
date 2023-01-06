@@ -1,0 +1,20 @@
+---
+- name: Checkout spineii repo
+  hosts: localhost
+  become: no
+
+  tasks:
+  - name: Remove old repo
+    command: sudo rm -rf ~/spineii
+
+  - name: Check spineii repo exists
+    stat:
+      path: ~/spineii
+    register: spineii_folder
+
+  - name: Get spineii repo
+    git:
+      accept_hostkey: yes
+      repo: 'git@github.com:NHSDigital/spineii.git'
+      dest: ~/spineii
+    when: not spineii_folder.stat.exists
