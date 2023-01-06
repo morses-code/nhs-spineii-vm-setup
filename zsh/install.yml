@@ -1,0 +1,52 @@
+---
+- name: Install zsh
+  hosts: localhost
+  become: yes
+
+  tasks:
+  - name: Gather package facts
+    package_facts:
+      manager: apt
+
+  - name: Print the package facts
+    debug:
+      var: ansible_facts.packages
+
+  - name: Install zsh if not already installed
+    apt:
+      name: zsh
+      state: present
+    when: "'zsh' not in ansible_facts.packages"
+  
+  - name: Make zsh default shell
+    user:
+      name: spineii-user
+      shell: /bin/zsh
+  
+  - name: Check zsh-autosuggestions is installed
+    become: no
+    stat:
+      path: ~/.zsh/zsh-autosuggestions
+    register: zsh_autosuggestions_repo
+
+  - name: Install zsh-autosuggestions
+    become: no
+    command: git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+    when: not zsh_autosuggestions_repo.stat.exists
+  
+  - name: Check zsh-syntax-highlighting is installed
+    become: no
+    stat:
+      path: ~/.zsh/zsh-syntax-highlighting
+    register: zsh_syntax_highlighting_repo
+
+  - name: Install zsh-syntax-highlighting
+    become: no
+    command: git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.zsh/zsh-syntax-highlighting
+    when: not zsh_syntax_highlighting_repo.stat.exists
+  
+  - name: Replace zshrc file
+    become: no
+    copy:
+      src: .zshrc
+      dest: ~/.zshrc

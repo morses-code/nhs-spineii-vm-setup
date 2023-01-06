@@ -1,0 +1,41 @@
+---
+- name: Configure git
+  hosts: localhost
+  become: no
+
+  tasks:
+  - name: Get git config user.name
+    pause:
+      prompt: "Enter your name"
+    register: user_name
+    
+  - name: Print user name
+    debug:
+      var: user_name.user_input
+
+  - name: Get git config user.email
+    pause:
+      prompt: "Enter your email address"
+    register: user_email
+    
+  - name: Print user email
+    debug:
+      var: user_email.user_input
+
+  - name: Apply git config user.name
+    git_config:
+      name: user.name
+      scope: global
+      value: "'{{ user_name.user_input }}'"
+      
+  - name: Apply git config user.email
+    git_config:
+      name: user.email
+      scope: global
+      value: "'{{ user_email.user_input }}'"
+
+  - name: Apply git config alias.ff
+    git_config:
+      name: alias.ff
+      scope: global
+      value: "pull --ff-only"

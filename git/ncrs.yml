@@ -1,0 +1,17 @@
+---
+- name: Checkout NCRS repo
+  hosts: localhost
+  become: no
+
+  tasks:
+  - name: Check NCRS repo exists
+    stat:
+      path: ~/ncrs
+    register: ncrs_folder
+
+  - name: Get NCRS repo
+    git:
+      accept_hostkey: yes
+      repo: 'git@github.com:NHSDigital/spine-ncrs.git'
+      dest: ~/ncrs
+    when: not ncrs_folder.stat.exists

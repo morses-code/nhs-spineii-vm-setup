@@ -1,0 +1,39 @@
+---
+- name: Install zsh
+  hosts: localhost
+  become: no
+
+  tasks:
+  - name: Check ssh key exists
+    stat:
+      path: /home/spineii-user/.ssh/id_rsa
+    register: ssh_key_file
+
+  - name: Create ssh key
+    command: ssh-keygen -t rsa -f /home/spineii-user/.ssh/id_rsa -q -N ""
+    when: not ssh_key_file.stat.exists
+
+  - name: Set ssh key
+    shell: |
+      eval "$(ssh-agent)"
+      ssh-add /home/spineii-user/.ssh/id_rsa
+    when: not ssh_key_file.stat.exists
+  
+  - name: Display public ssh key
+    command: cat /home/spineii-user/.ssh/id_rsa.pub
+    register: ssh_key
+    when: not ssh_key_file.stat.exists
+
+  - debug:
+      var: ssh_key.stdout
+    when: not ssh_key_file.stat.exists
+
+  - name: Pause to apply ssh key to git
+    pause:
+      prompt: "Add ssh key to github account"
+      echo: no
+    when: not ssh_key_file.stat.exists
+
+- import_playbook: zsh/install.yml
+- import_playbook: git/configure.yml
+- import_playbook: git/ncrs.yml
