@@ -1,0 +1,20 @@
+---
+- name: Checkout developer-setup-scripts repo
+  hosts: localhost
+  become: no
+
+  tasks:
+  - name: Remove old repo
+    command: sudo rm -rf ~/developer-setup-scripts
+
+  - name: Check developer-setup-scripts repo exists
+    stat:
+      path: ~/developer-setup-scripts
+    register: setup_scripts_folder
+
+  - name: Get developer-setup-scripts repo
+    git:
+      accept_hostkey: yes
+      repo: 'git@github.com:NHSDigital/spine-developer-setup-scripts.git'
+      dest: ~/developer-setup-scripts
+    when: not setup_scripts_folder.stat.exists

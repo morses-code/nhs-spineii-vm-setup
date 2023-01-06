@@ -1,0 +1,17 @@
+---
+- name: Checkout NCRS repo
+  hosts: localhost
+  become: no
+
+  tasks:
+  - name: Run NHS git setup script
+    script: ~/developer-setup-scripts/setup-git.sh
+    ignore_errors: yes
+
+  - name: Run vscode set up for NCRS
+    script: ~/developer-setup-scripts/setup-vscode-ncrs.sh
+    ignore_errors: yes
+
+  - name: Run vscode set up for Spineii
+    script: ~/developer-setup-scripts/setup-vscode-spineii.sh
+    ignore_errors: yes
