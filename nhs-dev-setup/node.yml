@@ -1,0 +1,33 @@
+---
+- name: Install nodejs
+  hosts: localhost
+  become: yes
+  vars:
+    NODEJS_VERSION: "18"
+
+  tasks:
+    - name: Install the gpg key for nodejs LTS
+      apt_key:
+        url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+        state: present
+    
+    - name: Update apt
+      shell: apt-get update
+    
+    - name: Install the nodejs LTS repos
+      apt_repository:
+        repo: "deb https://deb.nodesource.com/node_{{ NODEJS_VERSION }}.x {{ ansible_distribution_release }} main"
+        state: present
+
+    - name: Install nodejs
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Download nvm manager
+      shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    
+    - name: Configure nvm manager
+      shell: >
+        export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || 
+        printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
